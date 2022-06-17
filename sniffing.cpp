@@ -107,7 +107,7 @@ void ProcessPacket(unsigned char* buffer,int size){
     ++packets["OTHERS"];
         break;
     }
-    cout<<"TCP\t:  "<<packets["TCP"]<<"ICMP\t:   "<<packets["ICMP"]<<"IGMP\t:   "<<packets["IGMP"]<<"OTHERS\t:  "<<packets["OTHERS"]<<"TOTAL\t"<<packets["OTHERS"]<<'\n';
+    cout<<"TCP\t:  "<<packets["TCP"]<<"\tICMP\t:   "<<packets["ICMP"]<<"\tUDP\t:   "<<packets["UDP"]<<"\tOTHERS\t:  "<<packets["OTHERS"]<<"\tTOTAL\t"<<packets["total"]<<"\r";
 
 }
 void print_ethernet_header(unsigned char * buffer, int size){
