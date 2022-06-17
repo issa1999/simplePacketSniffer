@@ -198,7 +198,7 @@ void printData(unsigned char* data,int size){
         if(i!=0 && i%16==0) // one line of hexx printing is complete
         {
             logfile<<"\t\t";
-            for(int j = i-16;i<j;j++){
+            for(int j = i-16;j<i;j++){
                 if(data[j]>=32 && data[j]<=128){
                     logfile<<(unsigned char)data[j]; // if it is a number or alphabet
                 }else {
