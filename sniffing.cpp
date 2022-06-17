@@ -20,13 +20,22 @@
 #include<unistd.h>
 using namespace std;
 /**
+ * @brief  PACKET DESCRIPTION
+ * ETH: header|start_delimiter|destination|source|opt|length|payload|checksum|interpacket_gap
+ * IP: version|header_len|tot_len|id|flags|offset|ttl|protocol|checksum|source|desti|opt|data|
+ * ICMP: TYPE|CODE|CHECKSUM|--|DATA
+ * TCP: sourcePort|destPort|seqNum|ACK_NUM|DO|RSV|FLAGS|WINDOW|CHECKSUM|URG_POINTER|OPT
+ * UDP: sourceADRR|destADRR|zero|prot|udplen|{{sourceport|destport|length|checksum}}
+ * 
+ */
+/**
  * @brief Types to use 
  * 
  */
 typedef  struct iphdr iphdr ;
 typedef struct sockaddr_in sockaddr_in;
 typedef struct ethhdr ethhdr;
-typedef struct sockaddr sockaddr;
+typedef struct sockaddr sockaddr; // generic socket address :address family and data
 typedef struct tcphdr tcphdr;
 typedef struct udphdr udphdr;
 typedef struct icmphdr icmphdr;
@@ -46,20 +55,22 @@ void printData(unsigned char*,int);
  */
 struct sockaddr_in source,dest;
 map<string,int> packets;
-int i,j;
 ofstream  logfile("logfile.txt"); // logfile to put the result
 
 int main(){
     int saddr_size,data_size;
-    unsigned char* buffer;
+    unsigned char* buffer = (unsigned char*) malloc(INT_MAX);
     sockaddr saddr;
+    if(!logfile.is_open()){cout<<"FILE NOT OPEN",exit(1);}
      cout<<"Starting ...\n";
-int sock_raw = socket(AF_PACKET,SOCK_RAW,ETH_P_ALL); // socket to get the network traffic
+//cout<<packets["icmp"];
+     // create the listening socket which will capture all packet types 
+int sock_raw = socket(AF_PACKET,SOCK_RAW,htons(ETH_P_ALL));
     if(sock_raw<0) {perror("Error");exit(EXIT_FAILURE);}
     while(1){
         saddr_size = sizeof(saddr);
         //receive a packet
-        data_size = recvfrom(sock_raw,buffer,INT_MAX,0,&saddr,(socklen_t*)&saddr_size);
+        data_size = recvfrom(sock_raw,buffer,65536,0,&saddr,(socklen_t*)&saddr_size);
         if(data_size<0){
             perror("recvfrom error, can't get packets\n");
             exit(EXIT_FAILURE);
@@ -203,7 +214,7 @@ void printData(unsigned char* data,int size){
                     logfile<<"\t\t";//extra spaces
                 }
                 logfile<<"\t\t";
-                for(j=i-i%16;j<=i;j++){
+                for(int j=i-i%16;j<=i;j++){
                     if(data[j]>=32 && data[j]<=128){
                         logfile<<(unsigned char)data[j];
                     }
